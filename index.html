@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project AraLo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pk:#ff8fb8;--pkd:#e0508f;--bl:#6cc3ff;--bld:#2a86d6;--pkl:#fff0f7;--bll:#e6f5ff;--ink:#3b2a55;--gold:#ffd27a}
+*{box-sizing:border-box}
+body{margin:0;font-family:Fredoka,"Trebuchet MS",system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--pkl),var(--bll));min-height:100vh}
+h1,h2,h3{margin:.3em 0}
+.screen{display:none;min-height:100vh;padding:16px 16px 190px;max-width:900px;margin:auto}
+.screen.on{display:block}
+.btn{font:inherit;font-weight:700;font-size:1.25rem;border:0;border-radius:28px;padding:16px 28px;color:#fff;background:var(--pkd);box-shadow:0 6px 0 #a92f69;cursor:pointer;margin:8px}
+.btn.b{background:var(--bld);box-shadow:0 6px 0 #1b5f9e}
+.btn.s{font-size:1rem;padding:10px 18px}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.btn:focus-visible,.card:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
+.center{text-align:center}
+.logo{font-size:3.2rem;font-weight:700;color:var(--pkd);margin:0}
+.logo span{color:var(--bld)}
+.tag{font-size:1.2rem;margin:0 0 8px}
+.row{display:flex;flex-wrap:wrap;justify-content:center}
+.chip{font:inherit;font-weight:700;font-size:1.3rem;padding:16px 26px;margin:6px;border-radius:24px;border:4px solid var(--pk);background:#fff;color:var(--ink);cursor:pointer}
+.chip.on{background:var(--pk);color:#fff}
+.chip.b{border-color:var(--bl)}
+.chip.b.on{background:var(--bl)}
+.panel{background:#fff;border-radius:28px;padding:20px;margin:14px 0;border:4px solid var(--bl)}
+.panel.p{border-color:var(--pk)}
+/* Clem */
+#cw{position:fixed;left:8px;bottom:6px;z-index:30;display:flex;align-items:flex-end;pointer-events:none;transition:all .4s}
+#clem{width:130px;cursor:pointer;pointer-events:auto;animation:bob 2.4s ease-in-out infinite}
+#clem svg{width:100%;display:block;overflow:visible}
+#bub{pointer-events:none;background:#fff;border:4px solid var(--pk);border-radius:22px;padding:10px 14px;font-weight:600;max-width:min(62vw,340px);margin:0 0 50px 4px;position:relative}
+#cw.big{left:50%;bottom:auto;top:96px;transform:translateX(-50%);flex-direction:column;align-items:center}
+#cw.big #clem{width:min(240px,55vw)}
+#cw.big #bub{margin:6px 0 0;text-align:center}
+.blink{animation:blink 4s infinite;transform-origin:center;transform-box:fill-box}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-2deg)}}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+#clem.cheer{animation:jump .5s 4}
+@keyframes jump{50%{transform:translateY(-34px) scale(1.06)}}
+/* picker */
+.home{padding-top:12px}
+.homebtns{margin-top:300px}
+/* game */
+.hud{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.pill{background:#fff;border:3px solid var(--bl);border-radius:20px;padding:6px 14px;font-weight:700}
+.stage{position:relative;height:66vh;min-height:360px;border-radius:30px;overflow:hidden;margin-top:10px;background:linear-gradient(180deg,#bfe6ff,#ffd3e6);border:5px solid var(--pk)}
+#vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.qbar{position:absolute;top:10px;left:10px;right:10px;background:rgba(255,255,255,.93);border-radius:24px;padding:10px 16px;text-align:center;z-index:3}
+#qt{font-size:clamp(1.3rem,4.5vw,2.2rem);font-weight:700}
+#qv{min-height:0}
+#qv svg{width:34px;margin:2px}
+.cards{position:absolute;left:0;right:0;bottom:0;height:46%;display:flex;gap:8px;padding:8px;z-index:2}
+.card{flex:1;position:relative;border:5px solid #fff;border-radius:24px;background:rgba(255,143,184,.55);color:#fff;font:inherit;font-weight:700;font-size:clamp(1.4rem,5vw,2.8rem);overflow:hidden;cursor:pointer;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+.card:nth-child(2){background:rgba(108,195,255,.6)}
+.card .f{position:absolute;left:0;right:0;bottom:0;height:0;background:rgba(255,255,255,.55)}
+.card span{position:relative}
+.card.good{background:#5fd68a;animation:pop .5s}
+.card.bad{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+@keyframes pop{50%{transform:scale(1.12)}}
+.stage.snack #vid{display:none}
+.stage.snack .cards{align-items:center;height:52%}
+.stage.snack .card{border-radius:50%;max-height:100%;aspect-ratio:1;flex:0 1 32%;animation:float 2.6s ease-in-out infinite}
+.stage.snack .card:nth-child(2){animation-delay:.5s}
+.stage.snack .card:nth-child(3){animation-delay:1s}
+@keyframes float{50%{transform:translateY(-14px)}}
+.tummy{position:absolute;left:12px;top:44%;width:16px;bottom:12px;background:#fff;border-radius:10px;z-index:3;display:none;overflow:hidden}
+.snack .tummy{display:block}
+.tummy i{position:absolute;bottom:0;left:0;right:0;background:var(--pkd);height:0;transition:height .5s}
+.over{position:fixed;inset:0;background:rgba(59,42,85,.55);display:none;align-items:center;justify-content:center;z-index:40;padding:16px}
+.over.on{display:flex}
+.over .panel{max-width:460px;text-align:center}
+.hold{position:relative;overflow:hidden}
+.hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.4)}
+.photo{width:210px;height:260px;margin:10px auto;border-radius:28px;border:5px dashed var(--pk);background:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover;border-radius:20px}
+blockquote{margin:12px 0;padding:14px 18px;border-left:8px solid var(--pk);background:var(--pkl);border-radius:16px;font-size:1.2rem;font-weight:600}
+li{margin:6px 0;line-height:1.4}
+p{line-height:1.5}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+
+<section id="home" class="screen on center home">
+  <h1 class="logo">Project Ara<span>Lo</span></h1>
+  <p class="tag">Move, play and learn science and math with Clem!</p>
+  <div class="homebtns">
+    <div class="row">
+      <button class="btn" data-go="student">I am a student</button>
+      <button class="btn b" data-go="teacher">I am a teacher</button>
+    </div>
+    <div class="row">
+      <button class="btn s b" data-go="adult">Grown-up corner</button>
+      <button class="btn s" data-go="about">About</button>
+    </div>
+  </div>
+</section>
+
+<section id="pick" class="screen center">
+  <h2 id="pt">Pick your adventure</h2>
+  <h3>Grade level</h3><div class="row" id="gp"></div>
+  <h3>Subject</h3><div class="row" id="sp"></div>
+  <h3>How do you want to play?</h3><div class="row" id="mp"></div>
+  <p id="mhelp"></p>
+  <button class="btn" id="go">Let us play</button>
+  <button class="btn s b" data-go="home">Back</button>
+</section>
+
+<section id="game" class="screen">
+  <div class="hud">
+    <button class="btn s b" id="quit">Back</button>
+    <div class="pill" id="prog"></div>
+    <div class="pill" id="team" style="display:none"></div>
+    <button class="btn s" id="hear">Hear it again</button>
+  </div>
+  <div class="stage" id="stage">
+    <video id="vid" playsinline muted></video>
+    <div class="qbar"><div id="qt"></div><div id="qv"></div></div>
+    <div class="tummy"><i id="tum"></i></div>
+    <div class="cards" id="cards"></div>
+  </div>
+  <div class="row" id="tbar" style="display:none">
+    <button class="btn s" id="next">Next question</button>
+    <button class="btn s b" id="pause">Pause</button>
+  </div>
+</section>
+
+<section id="adult" class="screen">
+  <h2>Grown-up corner</h2>
+  <div id="gate" class="panel center">
+    <p>This area is for parents and guardians. Press and hold the button for 2 seconds.</p>
+    <button class="btn hold" id="hb">Hold to open<i></i></button>
+  </div>
+  <div id="ainfo" style="display:none">
+    <div class="panel p"><h3>Play time limit</h3>
+      <p>Clem will remind your child to rest when time is up. Right now: <b id="lim"></b> minutes.</p>
+      <div class="row" id="lp"></div></div>
+    <div class="panel"><h3>About the camera</h3>
+      <p>Active mode uses the camera to sense movement. Nothing is recorded, saved or sent anywhere. All of it stays on this device.</p>
+      <p>Please clear a safe space, keep an adult nearby, and use Tap mode any time the camera is not available.</p></div>
+    <div class="panel p"><h3>What your child learns</h3>
+      <p>Counting, addition, subtraction, multiplication and division for Kinder to Grade 3, plus science about living things, the body, weather, matter and forces. Topics are guided by the DepEd curriculum for these grades.</p></div>
+  </div>
+  <button class="btn s b" data-go="home">Back</button>
+</section>
+
+<section id="about" class="screen">
+  <h2>About Project AraLo</h2>
+  <div class="panel">
+    <p>Project AraLo is a play based learning app for Filipino preschoolers and grade schoolers. Kids learn science and math by moving their bodies, feeding Clem snacks and cheering her on.</p>
+  </div>
+  <div class="panel p center">
+    <h3>In loving memory</h3>
+    <div class="photo" id="ph"><img src="images/sr-mary-clemens.jpeg" alt="Sr. Mary Clemens (Leonila) Leyva" onerror="this.remove();document.getElementById('ph').insertAdjacentHTML('beforeend','<span>Photo of Sr. Mary Clemens coming soon</span>')"></div>
+    <p>This app is dedicated to <b>Sr. Mary Clemens (Leonila) Leyva</b>, a nun, an educator and a beloved grandmother. Clem is named after her.</p>
+    <blockquote>To educate is to set a person free. To educate is to transform the world.<br><small>St. Marie Eugenie of Jesus</small></blockquote>
+    <p>Made with love by her granddaughter.</p>
+  </div>
+  <div class="panel">
+    <h3>Breast health for grown-ups</h3>
+    <p>October is Breast Cancer Awareness Month. Finding changes early gives the best chance of successful treatment.</p>
+    <ul>
+      <li>Know what is normal for you by looking and gently feeling your breasts regularly.</li>
+      <li>See a doctor about a new lump or thickening in the breast or underarm, a change in size or shape, dimpling or redness of the skin, a nipple that turns inward or leaks, or pain that does not go away.</li>
+      <li>Most lumps are not cancer, but every change deserves a check.</li>
+      <li>Ask your doctor or local health center about clinical breast exams and mammograms, often discussed from around age 40, or earlier with a family history.</li>
+      <li>Men can be affected too.</li>
+    </ul>
+    <p><small>This is general information and not medical advice.</small></p>
+  </div>
+  <button class="btn s b" data-go="home">Back</button>
+</section>
+
+<div class="over" id="rest"><div class="panel center"><h2>Rest time!</h2><p>Clem is sleepy. Time to stretch, drink water and rest your eyes.</p><p>Grown-ups can press and hold to keep playing.</p><button class="btn hold" id="hb2">Hold to continue<i></i></button><button class="btn s b" data-go="home">Go home</button></div></div>
+<div class="over" id="end"><div class="panel center"><h2 id="et"></h2><p id="es"></p><button class="btn" id="again">Play again</button><button class="btn b" data-go="home">Home</button></div></div>
+
+<div id="cw"><div id="clem"></div><div id="bub"></div></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const r=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const shuf=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
+const pick1=a=>a[r(0,a.length-1)];
+const S={grade:'K',subj:'math',mode:'active',teacher:false,round:0,total:5,score:0,teams:[0,0],turn:0,q:null,tries:0,locked:false,start:0,paused:false};
+let limit=15;try{limit=+localStorage.getItem('aralo_limit')||15}catch(e){}
+
+/* Clem the lioness */
+function clemSVG(m){
+  let mane='';for(let i=0;i<10;i++){mane+=`<circle cx="100" cy="26" r="27" transform="rotate(${i*36} 100 108)"/>`}
+  const mouths={happy:'<path d="M82 140 Q100 158 118 140" fill="none" stroke="#7a2a52" stroke-width="5" stroke-linecap="round"/>',
+  cheer:'<path d="M80 136 Q100 172 120 136 Z" fill="#9c2f5f"/><ellipse cx="100" cy="152" rx="11" ry="7" fill="#ff8fb8"/>',
+  oops:'<path d="M88 150 Q100 138 112 150" fill="none" stroke="#7a2a52" stroke-width="5" stroke-linecap="round"/>'};
+  const eyes=m==='cheer'?'<path d="M64 104 Q76 90 88 104M112 104 Q124 90 136 104" fill="none" stroke="#3b2a55" stroke-width="6" stroke-linecap="round"/>':
+  '<g class="blink"><ellipse cx="76" cy="104" rx="10" ry="13" fill="#3b2a55"/><circle cx="72" cy="98" r="4" fill="#fff"/></g><g class="blink"><ellipse cx="124" cy="104" rx="10" ry="13" fill="#3b2a55"/><circle cx="120" cy="98" r="4" fill="#fff"/></g>';
+  return `<svg viewBox="0 0 200 200" aria-label="Clem the lioness"><g fill="#ff7fb0">${mane}</g>
+  <circle cx="50" cy="64" r="24" fill="#ffc25c"/><circle cx="50" cy="64" r="13" fill="#ff9fc4"/><circle cx="150" cy="64" r="24" fill="#ffc25c"/><circle cx="150" cy="64" r="13" fill="#ff9fc4"/>
+  <ellipse cx="100" cy="112" rx="64" ry="58" fill="#ffd27a"/><ellipse cx="100" cy="136" rx="32" ry="23" fill="#fff4d9"/>
+  ${eyes}<circle cx="60" cy="128" r="10" fill="#ff8fb8" opacity=".7"/><circle cx="140" cy="128" r="10" fill="#ff8fb8" opacity=".7"/>
+  <path d="M90 120 Q100 116 110 120 Q104 132 100 132 Q96 132 90 120Z" fill="#e0508f"/>${mouths[m==='cheer'?'cheer':m==='oops'?'oops':'happy']}
+  <g fill="#fff" opacity=".9"><circle cx="84" cy="134" r="1.8"/><circle cx="116" cy="134" r="1.8"/></g>
+  <g transform="translate(100 38)"><path d="M0 0 L-30 -16 L-30 16Z M0 0 L30 -16 L30 16Z" fill="#2a86d6"/><circle r="8" fill="#6cc3ff"/></g></svg>`;
+}
+let bt;
+function say(t,m='happy',ms=4500){
+  $('#clem').innerHTML=clemSVG(m);$('#bub').textContent=t;
+  const c=$('#clem');c.classList.toggle('cheer',m==='cheer');
+  clearTimeout(bt);if(ms)bt=setTimeout(()=>{$('#clem').innerHTML=clemSVG('happy');c.classList.remove('cheer')},ms);
+}
+function speak(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=.9;u.pitch=1.3;speechSynthesis.speak(u)}catch(e){}}
+$('#clem').onclick=()=>say(pick1(['Hi, I am Clem! Roar!','You are doing great!','Let us learn together!','I love learning with you!']),'cheer',3000);
+
+/* Navigation */
+const lines={home:'Hi, I am Clem! Ready to play?',pick:'Choose your grade and subject!',adult:'Hello, grown-ups!',about:'This app is named after my lola, Sr. M. Clemens.'};
+function go(id){
+  $$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
+  $('#cw').classList.toggle('big',id==='home');
+  $$('.over').forEach(o=>o.classList.remove('on'));
+  if(id!=='game')stopCam();
+  if(lines[id])say(lines[id]);
+  scrollTo(0,0);
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;const t=b.dataset.go;
+  if(t==='student'||t==='teacher'){S.teacher=t==='teacher';$('#pt').textContent=S.teacher?'Set up the class game':'Pick your adventure';go('pick')}else go(t)});
+
+/* Picker */
+const GR=[['K','Kinder'],['1','Grade 1'],['2','Grade 2'],['3','Grade 3']];
+function chips(el,list,key,cls){el.innerHTML='';list.forEach(([v,l])=>{const b=document.createElement('button');b.className='chip '+cls+(S[key]===v?' on':'');b.textContent=l;
+  b.onclick=()=>{S[key]=v;chips(el,list,key,cls);help()};el.appendChild(b)})}
+function help(){$('#mhelp').textContent=S.mode==='active'?'Move your arms in front of the camera to pick answers. Stand back so Clem can see you!':'Tap the snack that is the right answer to feed Clem.'}
+chips($('#gp'),GR,'grade','');chips($('#sp'),[['math','Math'],['sci','Science']],'subj','b');chips($('#mp'),[['active','Active mode'],['snack','Tap mode']],'mode','');help();
+$('#go').onclick=()=>{S.total=S.teacher?10:5;newGame()};
+
+/* Questions */
+const SCI={K:[["What do we use to see?","Eyes","Ears","Nose"],["Which one is an animal?","Dog","Rock","Chair"],["What do we see in the sky at night?","Moon","Sun","Rainbow"],["Which part helps us smell?","Nose","Hands","Feet"],["Which one is cold?","Ice","Fire","Hot soup"],["What do plants need to grow?","Water","Candy","Toys"]],
+'1':[["Which one is a living thing?","Tree","Spoon","Stone"],["What do we use to hear?","Ears","Eyes","Tongue"],["Which weather needs an umbrella?","Rainy","Sunny","Clear"],["Which animal has feathers?","Bird","Cat","Frog"],["What gives us light in the day?","Sun","Moon","Cloud"],["Which plant part grows under the soil?","Roots","Flower","Leaf"]],
+'2':[["Frozen water is called what?","Ice","Steam","Smoke"],["Which one is a solid?","Book","Milk","Air"],["What do leaves help a plant do?","Make food","Sleep","Run"],["Which sound is the loudest?","Thunder","Whisper","Falling leaf"],["Which animal lives in water?","Fish","Cow","Hen"],["What pulls things down to the ground?","Gravity","Shadow","Echo"]],
+'3':[["Water as a gas is called what?","Water vapor","Ice","Mud"],["Which one does a magnet attract?","Iron nail","Paper","Plastic cup"],["Which plant part carries water up?","Stem","Petal","Seed"],["Which one is a producer?","Grass","Lion","Hawk"],["A push or a pull is called what?","Force","Heat","Echo"],["Which one is warmed up fastest by heat?","Metal spoon","Wooden stick","Rubber band"]]};
+function opts(a,sp){const s=new Set([a]);let n=0;while(s.size<3&&n++<60){const v=a+r(-sp,sp);if(v>=0)s.add(v)}while(s.size<3)s.add(a+s.size);return shuf([...s])}
+function mk(p,t,a,sp,n){return{p,t,a,n,o:opts(a,sp).map(String),ai:0,ans:String(a)}}
+function makeQ(){
+  const g=S.grade;
+  if(S.subj==='sci'){const [p,a,b,c]=pick1(SCI[g]);const o=shuf([a,b,c]);return{p,t:p,o,ans:a}}
+  let q;
+  if(g==='K'){const n=r(1,10);q=mk('How many stars can you count?','How many stars can you count?',n,2,n)}
+  else if(g==='1'){if(r(0,1)){const a=r(1,10),b=r(1,10);q=mk(`${a} + ${b} = ?`,`What is ${a} plus ${b}?`,a+b,3)}else{const a=r(5,20),b=r(1,a);q=mk(`${a} - ${b} = ?`,`What is ${a} minus ${b}?`,a-b,3)}}
+  else if(g==='2'){if(r(0,1)){const a=r(10,60),b=r(10,38);q=mk(`${a} + ${b} = ?`,`What is ${a} plus ${b}?`,a+b,10)}else{const a=pick1([2,5,10]),b=r(1,10);q=mk(`${a} x ${b} = ?`,`What is ${a} times ${b}?`,a*b,a*2)}}
+  else{if(r(0,1)){const a=r(2,10),b=r(2,10);q=mk(`${a} x ${b} = ?`,`What is ${a} times ${b}?`,a*b,10)}else{const a=r(2,9),b=r(2,9);q=mk(`${a*b} / ${a} = ?`,`What is ${a*b} divided by ${a}?`,b,3)}}
+  q.o=q.o.map(String);return q;
+}
+
+/* Game */
+function newGame(){S.round=0;S.score=0;S.teams=[0,0];S.turn=0;S.start=Date.now();go('game');
+  $('#team').style.display=S.teacher?'':'none';$('#tbar').style.display=S.teacher?'':'none';
+  $('#stage').classList.toggle('snack',S.mode!=='active');
+  if(S.mode==='active')startCam();else stopCam();
+  nextQ()}
+function nextQ(){
+  if(!S.teacher&&Date.now()-S.start>limit*60000){$('#rest').classList.add('on');say('Zzz, I am sleepy...','oops',0);return}
+  if(S.round>=S.total)return finish();
+  S.round++;S.tries=0;S.locked=false;S.q=makeQ();ch=[0,0,0];
+  $('#prog').textContent=`Question ${S.round} of ${S.total}`;
+  if(S.teacher)$('#team').textContent=`${S.turn?'Team Blue':'Team Pink'} turn | Pink ${S.teams[0]} Blue ${S.teams[1]}`;
+  $('#qt').textContent=S.q.p;
+  const star='<svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.7 7.2L12 17.6 5.6 21.5l1.7-7.2L2 9.6 9 9z" fill="#ffb300"/></svg>';
+  $('#qv').innerHTML=S.q.n?star.repeat(S.q.n):'';
+  const c=$('#cards');c.innerHTML='';
+  S.q.o.forEach((o,i)=>{const b=document.createElement('button');b.className='card';b.innerHTML=`<div class="f"></div><span>${o}</span>`;b.onclick=()=>choose(i);c.appendChild(b)});
+  $('#tum').style.height=(S.score/S.total*100)+'%';
+  say(S.mode==='active'?'Wave your arms in the answer you pick!':'Tap the right snack for me!','happy',0);
+  speak(S.q.t);
+}
+function choose(i){
+  if(S.locked||S.paused)return;
+  const el=$('#cards').children[i];
+  if(S.q.o[i]===S.q.ans){
+    S.locked=true;el.classList.add('good');
+    if(S.tries===0){S.score++;if(S.teacher)S.teams[S.turn]++}
+    $('#tum').style.height=(S.score/S.total*100)+'%';
+    say(pick1(['Yay! Roar! That is right!','Yum, great job!','You did it! Amazing!']),'cheer',2500);
+    if(S.teacher){S.turn^=1}else setTimeout(nextQ,2400);
+  }else{S.tries++;el.classList.add('bad');setTimeout(()=>el.classList.remove('bad'),500);say(pick1(['Almost! Try another one.','Oops, have another look!']),'oops',2500)}
+}
+$('#next').onclick=()=>{if(S.locked)nextQ();else say('Pick an answer first!','oops',2000)};
+$('#pause').onclick=e=>{S.paused=!S.paused;e.target.textContent=S.paused?'Resume':'Pause';say(S.paused?'Taking a little break.':'Let us go!')};
+$('#hear').onclick=()=>S.q&&speak(S.q.t);
+$('#quit').onclick=()=>go('pick');
+function finish(){
+  const st=Math.max(1,Math.round(S.score/S.total*3));
+  $('#et').textContent=S.teacher?(S.teams[0]===S.teams[1]?'It is a tie!':S.teams[0]>S.teams[1]?'Team Pink wins!':'Team Blue wins!'):`You earned ${st} of 3 stars!`;
+  $('#es').textContent=S.teacher?`Pink ${S.teams[0]}, Blue ${S.teams[1]}`:`You got ${S.score} right on the first try.`;
+  $('#end').classList.add('on');say('Roar! You are a superstar!','cheer',0);
+}
+$('#again').onclick=()=>{$('#end').classList.remove('on');newGame()};
+
+/* Camera motion controller */
+let stream,timer,prev=null,ch=[0,0,0];
+const cv=document.createElement('canvas');cv.width=64;cv.height=48;const cx=cv.getContext('2d',{willReadFrequently:true});
+async function startCam(){
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:320,height:240},audio:false});
+    const v=$('#vid');v.srcObject=stream;await v.play();prev=null;timer=setInterval(scan,70)}
+  catch(e){S.mode='snack';$('#stage').classList.add('snack');say('I cannot see the camera, so we will tap instead!','oops',5000)}
+}
+function stopCam(){clearInterval(timer);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+function scan(){
+  if(!S.q||S.locked||S.paused||!stream)return;
+  cx.drawImage($('#vid'),0,0,64,48);const d=cx.getImageData(0,0,64,48).data,n=S.q.o.length,z=[0,0,0],g=new Float32Array(3072);
+  for(let p=0;p<3072;p++){g[p]=d[p*4]*.3+d[p*4+1]*.6+d[p*4+2]*.1;if(prev&&Math.abs(g[p]-prev[p])>26){const x=p%64;z[n-1-Math.floor(x*n/64)]++}}
+  prev=g;const per=3072/n;let best=0;
+  for(let i=0;i<n;i++){ch[i]=ch[i]*.88+z[i]/per;if(ch[i]>ch[best])best=i}
+  const cards=$('#cards').children;
+  for(let i=0;i<n;i++)cards[i].firstChild.style.height=Math.min(100,ch[i]/.8*100)+'%';
+  const second=Math.max(...ch.filter((_,i)=>i!==best&&i<n));
+  if(ch[best]>.8&&ch[best]>second*1.5)choose(best);
+}
+
+/* Grown-up corner */
+function holdBtn(btn,cb){let t0=0,raf;const bar=btn.querySelector('i');
+  const tick=()=>{const p=Math.min(1,(Date.now()-t0)/2000);bar.style.width=p*100+'%';if(p>=1){stop();cb()}else raf=requestAnimationFrame(tick)};
+  const stop=()=>{cancelAnimationFrame(raf);bar.style.width=0};
+  btn.addEventListener('pointerdown',()=>{t0=Date.now();tick()});['pointerup','pointerleave','pointercancel'].forEach(ev=>btn.addEventListener(ev,stop))}
+holdBtn($('#hb'),()=>{$('#gate').style.display='none';$('#ainfo').style.display='block';say('Thank you for keeping us safe!')});
+holdBtn($('#hb2'),()=>{S.start=Date.now();$('#rest').classList.remove('on');nextQ()});
+function lp(){$('#lim').textContent=limit;$('#lp').innerHTML='';[10,15,20,30].forEach(m=>{const b=document.createElement('button');b.className='chip b'+(m===limit?' on':'');b.textContent=m+' min';
+  b.onclick=()=>{limit=m;try{localStorage.setItem('aralo_limit',m)}catch(e){}lp()};$('#lp').appendChild(b)})}
+lp();
+$('#cw').classList.add('big');say('Hi, I am Clem! Ready to play?');
+</script>
+</body>
+</html>
